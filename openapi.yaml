@@ -1,0 +1,330 @@
+openapi: 3.0.0
+info:
+  title: Transaction Orchestrator API
+  description: Microservicio para orquestación de transacciones de pago
+  version: 1.0.0
+  contact:
+    name: Development Team
+    email: dev@example.com
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Desarrollo local
+  - url: https://api.example.com/api/v1
+    description: Producción
+
+tags:
+  - name: Transactions
+    description: Operaciones con transacciones
+
+paths:
+  /transactions:
+    post:
+      tags:
+        - Transactions
+      summary: Crear nueva transacción
+      description: Crea una nueva transacción procesando el pago mediante el proveedor seleccionado
+      operationId: createTransaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransactionRequest'
+      responses:
+        '201':
+          description: Transacción creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseTransaction'
+        '400':
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /transactions/{transaction_id}:
+    get:
+      tags:
+        - Transactions
+      summary: Consultar transacción
+      description: Obtiene los detalles de una transacción por su ID
+      operationId: getTransaction
+      parameters:
+        - name: transaction_id
+          in: path
+          required: true
+          description: ID único de la transacción
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transacción encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseTransaction'
+        '400':
+          description: ID de transacción inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Transacción no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /transactions/health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Verifica que el servicio esté disponible
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Servicio operativo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseHealth'
+
+components:
+  schemas:
+    # REQUEST SCHEMAS
+    CreateTransactionRequest:
+      type: object
+      required:
+        - transaction_id
+        - amount_in_cents
+        - currency_code
+        - country_code
+        - payment_method_id
+        - webhook_url
+        - redirect_url
+        - customer
+      properties:
+        transaction_id:
+          type: string
+          description: Identificador único de la transacción en el sistema cliente
+          example: TRX-001-001
+        amount_in_cents:
+          type: integer
+          format: int64
+          description: Monto de la transacción en centavos (sin separador decimal)
+          minimum: 1
+          example: 100000
+        currency_code:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          description: Código de moneda de 3 letras (ISO 4217)
+          example: USD
+        country_code:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          description: Código de país de 2 letras (ISO 3166-1 Alfa-2)
+          example: CO
+        payment_method_id:
+          type: string
+          description: Identificador del método de pago
+          example: PAYU_CREDIT_CARD
+        webhook_url:
+          type: string
+          format: uri
+          description: URL para notificaciones de estado de la transacción
+          example: https://example.com/webhook
+        redirect_url:
+          type: string
+          format: uri
+          description: URL para redirigir al cliente después del pago
+          example: https://example.com/success
+        customer:
+          $ref: '#/components/schemas/CustomerRequest'
+        transaction_description:
+          type: string
+          description: Descripción opcional de la transacción
+          example: Compra de producto ABC
+        link_expiration_time:
+          type: integer
+          format: int64
+          description: Tiempo de expiración del enlace en segundos
+          example: 3600
+
+    CustomerRequest:
+      type: object
+      required:
+        - document_type
+        - document_number
+        - country_calling_code
+        - phone_number
+        - email
+        - first_name
+        - first_surname
+      properties:
+        document_type:
+          type: string
+          description: Tipo de documento legal (CC, CI, DNI, etc.)
+          example: CC
+        document_number:
+          type: string
+          description: Número de documento legal del cliente
+          example: '1234567890'
+        country_calling_code:
+          type: string
+          description: Código de llamada del país del cliente
+          example: '+57'
+        phone_number:
+          type: string
+          pattern: '^\d+$'
+          description: Número de teléfono sin código de país ni formato
+          example: '3001234567'
+        email:
+          type: string
+          format: email
+          description: Dirección de correo electrónico del cliente
+          example: juan.perez@example.com
+        first_name:
+          type: string
+          description: Primer nombre del cliente
+          example: Juan
+        second_name:
+          type: string
+          description: Segundo nombre del cliente (opcional)
+          example: Carlos
+        first_surname:
+          type: string
+          description: Primer apellido del cliente
+          example: Pérez
+        second_surname:
+          type: string
+          description: Segundo apellido del cliente (opcional)
+          example: García
+
+    # RESPONSE SCHEMAS
+    ApiResponseTransaction:
+      type: object
+      properties:
+        response_code:
+          type: string
+          description: Código de respuesta (000 = éxito, otros = error)
+          example: '000'
+        response_message:
+          type: string
+          description: Mensaje descriptivo del resultado
+          example: Successful operation
+        data:
+          $ref: '#/components/schemas/TransactionResponse'
+
+    ApiResponseHealth:
+      type: object
+      properties:
+        response_code:
+          type: string
+          example: '000'
+        response_message:
+          type: string
+          example: Successful operation
+        data:
+          type: string
+          example: Transaction Orchestrator is running
+
+    TransactionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Identificador único asignado por el microservicio
+          example: 550e8400-e29b-41d4-a716-446655440000
+        transaction_id:
+          type: string
+          description: ID de transacción del cliente
+          example: TRX-001-001
+        amount_in_cents:
+          type: integer
+          format: int64
+          description: Monto en centavos
+          example: 100000
+        currency_code:
+          type: string
+          description: Código de moneda
+          example: USD
+        country_code:
+          type: string
+          description: Código de país
+          example: CO
+        payment_method_id:
+          type: string
+          description: Método de pago utilizado
+          example: PAYU_CREDIT_CARD
+        transaction_description:
+          type: string
+          description: Descripción de la transacción
+          example: Compra de producto ABC
+        processing_date:
+          type: string
+          format: date-time
+          description: Fecha de procesamiento de la transacción
+          example: '2026-04-25T15:30:45.123456'
+        status:
+          type: string
+          enum: [PENDING, PROCESSING, COMPLETED, FAILED, CANCELLED, REFUNDED]
+          description: Estado actual de la transacción
+          example: COMPLETED
+
+    ErrorResponse:
+      type: object
+      properties:
+        response_code:
+          type: string
+          description: Código de error
+          example: '001'
+        response_message:
+          type: string
+          description: Mensaje de error
+          example: Validation error
+        error_details:
+          type: string
+          description: Detalles específicos del error
+          example: amount_in_cents debe ser positivo
+
+  responses:
+    BadRequest:
+      description: Solicitud inválida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    InternalServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
