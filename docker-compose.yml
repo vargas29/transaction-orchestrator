@@ -1,65 +1,54 @@
-version: '3.8'
-
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:15-alpine
-    container_name: transaction-db
+  zookeeper:
+    #restart: always
+    image: bitnamilegacy/zookeeper:3.9
+    ports:
+      - "2181:2181"
+    volumes:
+      - "zookeeper-volume:/bitnami"
     environment:
-      POSTGRES_DB: transaction_orchestrator
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres123
+      - ALLOW_ANONYMOUS_LOGIN=yes
+  kafka:
+    #restart: always
+    image: bitnamilegacy/kafka:3.7
+    ports:
+      - "9093:9093"
+    volumes:
+      - "kafka-volume:/bitnami"
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true # desactivar para pruebas de caos
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+    depends_on:
+      - zookeeper
+
+  postgres:
+    image: postgres:14-alpine
     ports:
       - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/init.sql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Transaction Orchestrator Application
-  transaction-orchestrator:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: transaction-orchestrator
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/transaction_orchestrator
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres123
-      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
-      SPRING_PROFILES_ACTIVE: docker
+      - POSTGRES_DB=marketing_promotions_processorDB
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin123
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redpanda-console:
+    #restart: always
+    image: docker.redpanda.com/redpandadata/console:latest
     ports:
       - "8080:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/transactions/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-
-  # PgAdmin para administración de base de datos
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: transaction-pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: admin123
-    ports:
-      - "5050:80"
+      - KAFKA_BROKERS=kafka:9092
     depends_on:
-      - postgres
+      - kafka
 
 volumes:
-  postgres_data:
-
-networks:
-  default:
-    name: transaction-network
-
+  zookeeper-volume:
+  kafka-volume:
+  postgres-data:

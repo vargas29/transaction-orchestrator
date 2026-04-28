@@ -21,6 +21,8 @@ public class TransactionPersistenceAdapter implements TransactionRepositoryPort 
     @Override
     public Transaction save(Transaction transaction) {
         TransactionEntity entity = mapToEntity(transaction);
+        // Si la entidad no tiene id, generar UUID
+        if (entity.getId() == null) entity.setId(java.util.UUID.randomUUID());
         TransactionEntity saved = transactionRepository.save(entity);
         return mapToDomain(saved);
     }
@@ -67,7 +69,7 @@ public class TransactionPersistenceAdapter implements TransactionRepositoryPort 
 
     private Transaction mapToDomain(TransactionEntity entity) {
         Transaction transaction = new Transaction();
-        transaction.setId(String.valueOf(entity.getId()));
+        transaction.setId(entity.getId() != null ? entity.getId().toString() : null);
         transaction.setClientTransactionId(entity.getTransactionId());
         transaction.setAmountInCents(entity.getAmountInCents());
         transaction.setCurrencyCode(entity.getCurrencyCode());
@@ -86,6 +88,7 @@ public class TransactionPersistenceAdapter implements TransactionRepositoryPort 
 
     private CustomerEntity mapCustomerToEntity(Customer domain) {
         return CustomerEntity.builder()
+                .id(domain.getDocument_number() != null ? null : null)
                 .documentType(domain.getDocument_type())
                 .documentNumber(domain.getDocument_number())
                 .countryCallingCode(domain.getCountry_calling_code())

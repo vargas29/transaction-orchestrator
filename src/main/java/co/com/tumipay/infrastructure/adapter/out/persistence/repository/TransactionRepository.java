@@ -10,7 +10,7 @@ import java.util.Optional;
  * Repositorio Spring Data JPA para transacciones
  */
 @Repository
-public interface TransactionRepository extends JpaRepository<TransactionEntity, Long> {
+public interface TransactionRepository extends JpaRepository<TransactionEntity, java.util.UUID> {
     
     /**
      * Busca una transacción por su transaction_id único

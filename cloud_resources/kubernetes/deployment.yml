@@ -1,0 +1,49 @@
+# Configuración de despliegue de microservicios en Kubernetes.
+# Para más detalle puede referirse a la documentación en confluence https://flypass.atlassian.net/wiki/spaces/BCF/pages/2974482433/Deployment
+deployment:  # Tipo de workload: puede ser 'deployment' o 'statefulset'
+  - name: "marketing-promotions-processor"  # Nombre único del microservicio (usado para el Deployment, Service, etc.)
+    maven_version: "3.9.8"  # Versión de Maven usada para compilar la app
+    java_version: 24  # Versión de Java usada en la imagen base
+    micrometer_auto_enabled: true # Asignar false cuando se definan dependencias micrometer en el POM
+    labels:  # Etiquetas aplicadas al Deployment para organización o afinidad
+      tier: "backend"  # Tipo o capa del microservicio (e.g. backend, frontend)
+    min_replicas: 2  # Réplicas mínimas configuradas para el HPA
+    max_replicas: 4  # Réplicas máximas configuradas para el HPA
+    min_available: 2  # Cantidad mínima de pods disponibles durante rollout
+    revision_history_limit: 2  # Historial de revisiones de despliegue conservadas
+    path: "/marketing-promotions-processor"  # Ruta del contexto del microservicio en el repositorio
+    port: 9178 # Puerto expuesto por el contenedor
+    target_port: 9178  # Puerto interno del contenedor
+    listener_port: "80"  # Puerto del ALB para exponer el servicio (e.g. 443 para HTTPS)
+    resources:  # Recurso CPU y memoria por entorno (certificación, producción, etc.)
+      cert:
+        memory: 1024
+        cpu: 512
+      prod:
+        memory: 1524
+        cpu: 512
+    liveness_probe:  # Prueba para verificar si el contenedor sigue funcionando
+      path: "/marketing-promotions-processor/actuator/health/liveness"
+      initial_delay_seconds: 200
+      period_seconds: 30
+      success_threshold: 1
+      failure_threshold: 3
+    readiness_probe:  # Prueba para saber si el contenedor está listo para recibir tráfico
+      path: "marketing-promotions-processor/actuator/health/readiness"
+      initial_delay_seconds: 180
+      period_seconds: 30
+      success_threshold: 1
+      failure_threshold: 3
+    hpa_metrics: # Definición de métricas a usar y porcentaje para escalar los pods.
+      - metric_type: "Resource"
+        resource_name: "cpu"
+        target_type: "Utilization"
+        average_utilization: 80
+      - metric_type: "Resource"
+        resource_name: "memory"
+        target_type: "Utilization"
+        average_utilization: 90
+    tags:  # Información organizacional o de clasificación del microservicio
+      dominio: "marketing"
+      subdominio: "promotions"
+      iniciativa: "mastercard"

@@ -23,6 +23,10 @@ CREATE INDEX idx_transactions_created_at
     ON transactions (created_at);
 
 -- Índice por client_txn_id (aunque ya es UNIQUE, ayuda explícitamente)
-CREATE INDEX idx_transactions_client_txn_id
-    ON transactions (client_txn_id);
+CREATE INDEX idx_transactions_transaction_id
+    ON transactions (transaction_id);
+
+-- Índice por monto (útil para reports / filtros)
+CREATE INDEX idx_transactions_amount_in_cents
+    ON transactions (amount_in_cents);
 

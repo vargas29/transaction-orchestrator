@@ -21,18 +21,18 @@ public class TransactionMapper {
         Customer customer = toDomain(request.getCustomer());
 
         Transaction tx = new Transaction(
-                request.getClientTransactionId(),
-                request.getAmountInCents(),
-                request.getCurrencyCode(),
-                request.getCountryCode(),
-                request.getPaymentMethodId(),
+                request.getTransaction_id(),
+                request.getAmount_in_cents(),
+                request.getCurrency_code(),
+                request.getCountry_code(),
+                request.getPayment_method_id(),
                 customer,
-                request.getWebhookUrl(),
-                request.getRedirectUrl()
+                request.getWebhook_url(),
+                request.getRedirect_url()
         );
 
-        tx.setTransactionDescription(request.getTransactionDescription());
-        tx.setLinkExpirationTime(request.getLinkExpirationTime());
+        tx.setTransactionDescription(request.getTransaction_description());
+        tx.setLinkExpirationTime(request.getLink_expiration_time());
 
         return tx;
     }
@@ -57,16 +57,16 @@ public class TransactionMapper {
         if (customerRequest == null) return null;
 
         Customer customer = new Customer(
-                customerRequest.getDocumentType(),
-                customerRequest.getDocumentNumber(),
-                customerRequest.getCountryCallingCode(),
-                customerRequest.getPhoneNumber(),
+                customerRequest.getDocument_type(),
+                customerRequest.getDocument_number(),
+                customerRequest.getCountry_calling_code(),
+                customerRequest.getPhone_number(),
                 customerRequest.getEmail(),
-                customerRequest.getFirstName(),
-                customerRequest.getFirstSurname()
+                customerRequest.getFirst_name(),
+                customerRequest.getFirst_surname()
         );
-        customer.setSecond_name(customerRequest.getSecondName());
-        customer.setSecond_surname(customerRequest.getSecondSurname());
+        customer.setSecond_name(customerRequest.getSecond_name());
+        customer.setSecond_surname(customerRequest.getSecond_surname());
         return customer;
     }
 }

@@ -15,7 +15,12 @@ public interface PaymentProviderPort {
     /**
      * Reembolsa un pago
      */
-    boolean refundPayment(String transactionId);  PaymentMethod supports();
+    boolean refundPayment(String transactionId);
+
+    /**
+     * Indica qué PaymentMethod soporta este proveedor
+     */
+    PaymentMethod supports();
 
 }
 

@@ -3,6 +3,7 @@ package co.com.tumipay.infrastructure.adapter.out.persistence.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Entidad JPA para persistencia de transacciones en base de datos.
@@ -16,8 +17,8 @@ import java.time.LocalDateTime;
 public class TransactionEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id", columnDefinition = "uuid")
+    private UUID id;
 
     @Column(name = "transaction_id", nullable = false, unique = true)
     private String transactionId;

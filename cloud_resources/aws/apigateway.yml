@@ -1,0 +1,7 @@
+# Configuración de despliegue apigateway.
+# Para más detalle puede referirse a la documentación en confluence https://flypass.atlassian.net/wiki/spaces/BCF/pages/2974482433/Apigateway
+api:
+  - name: ""  # Nombre identificador del API. Se usa como nombre en API Gateway
+    route: "" # Ruta al archivo Swagger/OpenAPI
+    #token-legacy:  # Lista de paths que deben usar el authorizer Lambda legacy
+      #- get /api/v1/prueba

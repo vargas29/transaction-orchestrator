@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<architecture>
+  <name>Transaction Orchestrator - Hexagonal</name>
+  <components>
+    <component id="controller" type="inbound">
+      <name>TransactionController</name>
+      <description>Exposes REST API endpoints POST /api/v1/transactions and GET /api/v1/transactions/{transaction_id}</description>
+    </component>
+    <component id="usecases" type="application">
+      <name>Use Cases</name>
+      <description>CreateTransactionUseCase, GetTransactionUseCase - orchestrate flow and validation</description>
+    </component>
+    <component id="domain" type="domain">
+      <name>Domain</name>
+      <description>Transaction, Customer, TransactionStatus - business rules and validation</description>
+    </component>
+    <component id="persistence" type="outbound">
+      <name>Persistence Adapter</name>
+      <description>JPA / Hibernate entities TransactionEntity, CustomerEntity - responsible for database mapping</description>
+    </component>
+    <component id="providers" type="outbound">
+      <name>Payment Providers</name>
+      <description>PayuAdapter, StripeAdapter - implement PaymentProviderPort and are registered by PaymentProviderFactory</description>
+    </component>
+    <component id="events" type="outbound">
+      <name>Event Publisher</name>
+      <description>KafkaEventPublisher implements EventPublisherPort to publish events to Kafka topics</description>
+    </component>
+    <component id="metrics" type="observability">
+      <name>Metrics</name>
+      <description>Micrometer metrics exposed via Actuator Prometheus</description>
+    </component>
+  </components>
+  <flows>
+    <flow from="controller" to="usecases" description="HTTP request -> DTO -> mapper -> Use Case execution" />
+    <flow from="usecases" to="domain" description="Business rules and domain validation" />
+    <flow from="domain" to="persistence" description="Persist transaction before sending to provider" />
+    <flow from="usecases" to="providers" description="PaymentProviderFactory selects provider -> provider.processPayment" />
+    <flow from="domain" to="events" description="Publish TransactionCreated/Completed/Failed events" />
+    <flow from="domain" to="metrics" description="Record counters and timers (total, success, failed, processing_time)" />
+  </flows>
+</architecture>

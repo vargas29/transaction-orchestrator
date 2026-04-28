@@ -1,0 +1,26 @@
+chore: alinear migraciones y entidades, corregir providers y mappers, añadir métricas y eventos, crear diagrama
+
+Cambios principales realizados:
+- Alineadas migraciones Liquibase (v1.0.0) con las entidades JPA (nombres snake_case y tipos UUID).
+- Convertidas las entidades JPA `TransactionEntity` y `CustomerEntity` para usar `UUID` como PK.
+- Actualizado `TransactionRepository` a `JpaRepository<TransactionEntity, UUID>`.
+- Ajustado `TransactionPersistenceAdapter` para mapear UUID <-> String y generar UUID si falta.
+- Corregida interfaz `PaymentProviderPort` (métodos: processPayment, refundPayment, supports).
+- Implementados/ajustados adaptadores de proveedor `PayuProviderAdapter` y `StripeProviderAdapter` para implementar `PaymentProviderPort`.
+- Mapper HTTP manual `TransactionMapper` actualizado para campos snake_case.
+- DTO `CreateTransactionRequest` actualizado a campos snake_case y validaciones.
+- Añadidas métricas (Micrometer) y eventos (Kafka-ready) en `TransactionApplicationService` (instrumentación + publicación de eventos).
+- Añadida dependencia explícita `org.apache.kafka:kafka-clients` al `pom.xml`.
+- Migraciones de BD actualizadas: 001-create-customers-table.sql, 002-create-transactions-table.sql, 003-create-indexes.sql.
+- Creado diagrama de arquitectura en `docs/architecture.drawio.xml` y exportado a `docs/architecture.svg` y `docs/architecture.xml`.
+
+Notas:
+- Es necesario ejecutar `mvn -DskipTests clean package` en tu máquina para descargar dependencias y compilar.
+- No he ejecutado git commit en tu entorno; a continuación tienes los comandos sugeridos.
+
+Comandos sugeridos (PowerShell):
+    cd 'C:\Users\Mafe\Documents\transaction-orchestrator'
+    git add .
+    git commit -m "chore: alinear migraciones y entidades, corregir providers y mappers, añadir métricas y eventos, agregar diagrama"
+    git push origin HEAD
+

@@ -1,0 +1,76 @@
+<mxfile host="app.diagrams.net" modified="2026-04-27T00:00:00.000Z" agent="Mozilla/5.0" etag="abcd1234" version="20.0.0" type="device">
+  <diagram id="architecture-diagram" name="Architecture">
+    <mxGraphModel dx="1068" dy="656" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Presentation -->
+        <mxCell id="controller" value="TransactionController (REST API)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Ports / Use Cases -->
+        <mxCell id="ports" value="Use Cases (Create / Get)\nCreateTransactionUseCase, GetTransactionUseCase" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="300" y="40" width="260" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Domain -->
+        <mxCell id="domain" value="Dominio\nTransaction, Customer, TransactionStatus" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="300" y="150" width="260" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- Persistence -->
+        <mxCell id="persistence" value="Adaptador BD (JPA)\nTransactionEntity, CustomerEntity" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="600" y="150" width="260" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- Providers -->
+        <mxCell id="providers" value="Adaptadores de Pago\nPayuAdapter, StripeAdapter" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="40" y="150" width="220" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- Events / Kafka -->
+        <mxCell id="events" value="Eventos (Kafka-ready)\nTransactionCreated/Completed/Failed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0d0d0;strokeColor=#808080;" vertex="1" parent="1">
+          <mxGeometry x="600" y="40" width="220" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Metrics -->
+        <mxCell id="metrics" value="Métricas (Micrometer)\ntransactions_total, processing_time" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5dc;strokeColor=#c0a000;" vertex="1" parent="1">
+          <mxGeometry x="300" y="280" width="260" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Edges -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#6c8ebf;" edge="1" parent="1" source="controller" target="ports">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#82b366;" edge="1" parent="1" source="ports" target="domain">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d6b656;" edge="1" parent="1" source="domain" target="persistence">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#9673a6;" edge="1" parent="1" source="ports" target="providers">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#808080;" edge="1" parent="1" source="domain" target="events">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#c0a000;" edge="1" parent="1" source="domain" target="metrics">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Labels / notes -->
+        <mxCell id="note" value="Context: Orquestador de Transacciones - Hexagonal Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="360" width="820" height="40" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

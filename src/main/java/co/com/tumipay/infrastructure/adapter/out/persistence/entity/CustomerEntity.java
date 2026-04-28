@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.UUID;
 
 /**
  * Entidad JPA para cliente
@@ -18,8 +19,8 @@ import lombok.NoArgsConstructor;
 public class CustomerEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id", columnDefinition = "uuid")
+    private UUID id;
     @Column(name = "document_type", nullable = false)
     private String documentType;
 
