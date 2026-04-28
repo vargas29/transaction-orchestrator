@@ -339,51 +339,6 @@ GET /transactions/health
 7. **Logs**: Se confía en framework de logging de Spring
 8. **Caché**: No implementado (se recomienda agregar para consultas frecuentes)
 
----
-
-## ⚠️ Riesgos Identificados
-
-### 1. **Riesgo: Pérdida de Transacciones en Proveedores**
-- **Impacto**: Alto
-- **Probabilidad**: Media
-- **Mitigación**: 
-  - Guardar en BD ANTES de enviar a proveedor
-  - Implementar reintentos exponenciales
-  - Implementar reconciliación periódica
-
-### 2. **Riesgo: Inconsistencia de Datos**
-- **Impacto**: Alto
-- **Probabilidad**: Media
-- **Mitigación**:
-  - Usar transacciones ACID
-  - Implementar validaciones en dominio
-  - Usar optimistic locking
-
-### 3. **Riesgo: Performance bajo alta concurrencia**
-- **Impacto**: Medio
-- **Probabilidad**: Media
-- **Mitigación**:
-  - Agregar caché distribuido (Redis)
-  - Implementar índices en BD
-  - Usar conexión pooling
-  - Considerar CQRS para lectas
-
-### 4. **Riesgo: Exposición de datos sensibles**
-- **Impacto**: Alto
-- **Probabilidad**: Baja
-- **Mitigación**:
-  - Implementar HTTPS
-  - Encriptar datos sensibles (email, teléfono)
-  - Implementar autenticación y autorización
-  - Auditoría de accesos
-
-### 5. **Riesgo: Falta de documentación de cambios**
-- **Impacto**: Medio
-- **Probabilidad**: Alta
-- **Mitigación**:
-  - Mantener changelog.md
-  - Usar versionamiento semántico
-  - Documentar cambios de API
 
 ---
 
