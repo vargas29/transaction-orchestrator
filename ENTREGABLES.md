@@ -19,6 +19,11 @@ Este documento lista los entregables solicitados para la prueba IT-TEST-001 y d�
      - `src/main/resources/db/changelog/v1.0.0/002-create-transactions-table.sql`
      - `src/main/resources/db/changelog/v1.0.0/003-create-indexes.sql`
 
+12. Diagrama de normalización de base de datos
+    - Draw.io (editable): `docs/db_normalization.drawio.xml`
+    - SVG (visual): `docs/db_normalization.svg`
+    - Documentación: `docs/DB_NORMALIZATION.md`
+
 5. README con decisiones, suposiciones y riesgos
    - `README.md`
 
